@@ -1858,6 +1858,45 @@ __webpack_require__.r(__webpack_exports__);
   name: "Frontend",
   components: {
     Navbar: _components_Navbar__WEBPACK_IMPORTED_MODULE_0__.default
+  },
+  props: {
+    name: String,
+    role: String
+  },
+  data: function data() {
+    return {
+      user: null
+    };
+  },
+  created: function created() {
+    var _this = this;
+
+    if (this.role !== '') {
+      this.user = {
+        name: this.name,
+        role: this.role
+      };
+
+      if (this.role === 'assin') {
+        axios.get('/api/media/streams').then(function (response) {
+          _this.$store.commit('SET_MEDIA', response.data);
+        })["catch"](function (errors) {
+          return console.log(errors);
+        });
+      } else if (this.role === 'admin') {
+        axios.get('/api/media').then(function (response) {
+          _this.media = response.data;
+        })["catch"](function (errors) {
+          return console.log(errors);
+        });
+      }
+    } else {
+      axios.get('/api/media/streams').then(function (response) {
+        _this.$store.commit('SET_MEDIA', response.data);
+      })["catch"](function (errors) {
+        return console.log(errors);
+      });
+    }
   }
 });
 
@@ -1904,22 +1943,24 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "Navbar",
+  props: {
+    user: Object
+  },
+  computed: {
+    media: function media() {
+      return this.$store.getters.getMedia;
+    }
+  },
   methods: {
     login: function login() {
       window.location.href = '/login';
+    },
+    logout: function logout() {
+      axios.post('/logout').then(function () {
+        return window.location.href = '/';
+      });
     },
     register: function register() {
       window.location.href = '/register';
@@ -2026,9 +2067,13 @@ var routes = [{
   component: _frontend_Movies__WEBPACK_IMPORTED_MODULE_0__.default,
   name: 'home'
 }, {
-  path: '/filmes',
+  path: '/filmes/:media_id',
   component: _frontend_Movies__WEBPACK_IMPORTED_MODULE_0__.default,
   name: 'movies'
+}, {
+  path: '/series/:media_id',
+  component: _frontend_Movies__WEBPACK_IMPORTED_MODULE_0__.default,
+  name: 'series'
 }];
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__.default({
   mode: "history",
@@ -2079,7 +2124,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({//
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  getMedia: function getMedia(state) {
+    return state.media;
+  }
 });
 
 /***/ }),
@@ -2095,7 +2143,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({//
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  SET_MEDIA: function SET_MEDIA(state, payload) {
+    state.media = payload;
+  }
 });
 
 /***/ }),
@@ -2111,7 +2162,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({//
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  media: null
 });
 
 /***/ }),
@@ -36991,7 +37043,11 @@ var render = function() {
   return _c(
     "div",
     { attrs: { id: "main" } },
-    [_c("navbar"), _vm._v(" "), _c("router-view")],
+    [
+      _c("navbar", { attrs: { user: _vm.user } }),
+      _vm._v(" "),
+      _c("router-view")
+    ],
     1
   )
 }
@@ -37019,7 +37075,7 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("b-navbar", {
-    attrs: { "wrapper-class": "container" },
+    attrs: { id: "navbar-frontend", "wrapper-class": "container" },
     scopedSlots: _vm._u([
       {
         key: "brand",
@@ -37028,15 +37084,7 @@ var render = function() {
             _c(
               "b-navbar-item",
               { attrs: { tag: "router-link", to: { path: "/" } } },
-              [
-                _c("img", {
-                  attrs: {
-                    src:
-                      "https://raw.githubusercontent.com/buefy/buefy/dev/static/img/buefy-logo.png",
-                    alt: "Lightweight UI components for Vue.js based on Bulma"
-                  }
-                })
-              ]
+              [_vm._v("\n            MSCollection\n        ")]
             )
           ]
         },
@@ -37046,28 +37094,62 @@ var render = function() {
         key: "start",
         fn: function() {
           return [
-            _c("b-navbar-item", { attrs: { href: "#" } }, [
-              _vm._v("\n            Home\n        ")
-            ]),
+            _vm.media
+              ? _c(
+                  "b-navbar-dropdown",
+                  {
+                    staticClass: "navbar-dropdown-frontend",
+                    attrs: { label: "Filmes" }
+                  },
+                  _vm._l(_vm.media, function(m) {
+                    return _c(
+                      "b-navbar-item",
+                      {
+                        key: m.id + "movies",
+                        attrs: {
+                          tag: "router-link",
+                          to: { path: "/filmes/m.id" }
+                        }
+                      },
+                      [
+                        _vm._v(
+                          "\n                " +
+                            _vm._s(m.name) +
+                            "\n            "
+                        )
+                      ]
+                    )
+                  }),
+                  1
+                )
+              : _vm._e(),
             _vm._v(" "),
-            _c("b-navbar-item", { attrs: { href: "#" } }, [
-              _vm._v("\n            Documentation\n        ")
-            ]),
-            _vm._v(" "),
-            _c(
-              "b-navbar-dropdown",
-              { attrs: { label: "Info" } },
-              [
-                _c("b-navbar-item", { attrs: { href: "#" } }, [
-                  _vm._v("\n                About\n            ")
-                ]),
-                _vm._v(" "),
-                _c("b-navbar-item", { attrs: { href: "#" } }, [
-                  _vm._v("\n                Contact\n            ")
-                ])
-              ],
-              1
-            )
+            _vm.media
+              ? _c(
+                  "b-navbar-dropdown",
+                  { attrs: { label: "Séries" } },
+                  _vm._l(_vm.media, function(m) {
+                    return _c(
+                      "b-navbar-item",
+                      {
+                        key: m.id + "series",
+                        attrs: {
+                          tag: "router-link",
+                          to: { path: "/series/m.id" }
+                        }
+                      },
+                      [
+                        _vm._v(
+                          "\n                " +
+                            _vm._s(m.name) +
+                            "\n            "
+                        )
+                      ]
+                    )
+                  }),
+                  1
+                )
+              : _vm._e()
           ]
         },
         proxy: true
@@ -37076,22 +37158,27 @@ var render = function() {
         key: "end",
         fn: function() {
           return [
-            _c("b-navbar-item", { attrs: { tag: "div" } }, [
-              _c("div", { staticClass: "buttons" }, [
-                _c(
+            !_vm.user
+              ? _c(
                   "a",
-                  {
-                    staticClass: "button is-primary",
-                    on: { click: _vm.login }
-                  },
-                  [_vm._v("Login")]
-                ),
-                _vm._v(" "),
-                _c("a", { staticClass: "button is-light" }, [
-                  _vm._v("\n                    Log in\n                ")
+                  { staticClass: "navbar-item", on: { click: _vm.login } },
+                  [_vm._v("Entre")]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            !_vm.user
+              ? _c(
+                  "a",
+                  { staticClass: "navbar-item", on: { click: _vm.register } },
+                  [_vm._v("Registre-se")]
+                )
+              : _c("b-navbar-dropdown", { attrs: { label: _vm.user.name } }, [
+                  _c(
+                    "a",
+                    { staticClass: "navbar-item", on: { click: _vm.logout } },
+                    [_vm._v("Sair")]
+                  )
                 ])
-              ])
-            ])
           ]
         },
         proxy: true
@@ -37129,7 +37216,7 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "container" }, [
+    return _c("div", { staticClass: "container mt-3" }, [
       _c("div", { staticClass: "columns" }, [
         _c("div", { staticClass: "column is-full" }, [
           _c("header", { staticClass: "has-text-centered" }, [

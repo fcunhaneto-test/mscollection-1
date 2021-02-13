@@ -1,3 +1,3 @@
 export default {
-    //
+    media: null,
 }

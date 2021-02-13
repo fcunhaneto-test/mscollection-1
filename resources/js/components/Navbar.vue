@@ -1,39 +1,28 @@
 <template>
-    <b-navbar wrapper-class="container">
+    <b-navbar id="navbar-frontend" wrapper-class="container">
         <template #brand>
             <b-navbar-item tag="router-link" :to="{ path: '/' }">
-                <img
-                    src="https://raw.githubusercontent.com/buefy/buefy/dev/static/img/buefy-logo.png"
-                    alt="Lightweight UI components for Vue.js based on Bulma"
-                >
+                MSCollection
             </b-navbar-item>
         </template>
         <template #start>
-            <b-navbar-item href="#">
-                Home
-            </b-navbar-item>
-            <b-navbar-item href="#">
-                Documentation
-            </b-navbar-item>
-            <b-navbar-dropdown label="Info">
-                <b-navbar-item href="#">
-                    About
+            <b-navbar-dropdown v-if="media" class="navbar-dropdown-frontend" label="Filmes">
+                <b-navbar-item v-for="m in media" tag="router-link" :to="{ path: `/filmes/m.id` }" :key="m.id +'movies'">
+                    {{ m.name }}
                 </b-navbar-item>
-                <b-navbar-item href="#">
-                    Contact
+            </b-navbar-dropdown>
+            <b-navbar-dropdown v-if="media" label="Séries">
+                <b-navbar-item v-for="m in media" tag="router-link" :to="{ path: `/series/m.id` }" :key="m.id +'series'">
+                    {{ m.name }}
                 </b-navbar-item>
             </b-navbar-dropdown>
         </template>
-
         <template #end>
-            <b-navbar-item tag="div">
-                <div class="buttons">
-                    <a class="button is-primary" @click="login">Login</a>
-                    <a class="button is-light">
-                        Log in
-                    </a>
-                </div>
-            </b-navbar-item>
+            <a v-if="!user" class="navbar-item" @click="login">Entre</a>
+            <a v-if="!user" class="navbar-item" @click="register">Registre-se</a>
+            <b-navbar-dropdown v-else :label="user.name">
+                <a class="navbar-item" @click="logout">Sair</a>
+            </b-navbar-dropdown>
         </template>
     </b-navbar>
 </template>
@@ -42,14 +31,25 @@
 <script>
 export default {
     name: "Navbar",
+    props: {
+        user: Object
+    },
+    computed: {
+        media() {
+            return this.$store.getters.getMedia
+        }
+    },
     methods: {
         login() {
             window.location.href = '/login'
         },
+        logout() {
+            axios.post('/logout').then(() => window.location.href = '/')
+        },
         register() {
             window.location.href = '/register'
         }
-    }
+    },
 }
 </script>
 

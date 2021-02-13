@@ -8,9 +8,14 @@ const routes = [
         name: 'home'
     },
     {
-        path: '/filmes',
+        path: '/filmes/:media_id',
         component: Movies,
         name: 'movies'
+    },
+    {
+        path: '/series/:media_id',
+        component: Movies,
+        name: 'series'
     },
 ];
 

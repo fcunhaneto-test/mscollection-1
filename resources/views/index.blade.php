@@ -30,7 +30,11 @@
 </head>
 <body>
 <div id="app">
-    <frontend></frontend>
+    @guest
+        <frontend :name="''" :role="''"></frontend>
+    @else
+        <frontend :name="'{{ auth()->user()->name }}'" :role="'{{ auth()->user()->role }}'"></frontend>
+    @endif
 </div>
 </body>
 </html>

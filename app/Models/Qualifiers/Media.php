@@ -31,7 +31,7 @@ class Media extends Model
         return $this->belongsToMany(Season::class)->withPivot('active');
     }
 
-    public function isStreams()
+    public function getStreams()
     {
         return $this->where('isstream', '=', true)->get();
     }

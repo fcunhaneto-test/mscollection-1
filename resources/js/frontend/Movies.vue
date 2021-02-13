@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container mt-3">
         <div class="columns">
             <div class="column is-full">
                 <header class="has-text-centered">
@@ -12,7 +12,7 @@
 
 <script>
 export default {
-    name: "Movies"
+    name: "Movies",
 }
 </script>
 
